@@ -1,5 +1,6 @@
 package com.example.loan.controller;
 
+import com.example.loan.dto.ApplicationDTO.AcceptTermsDTO;
 import com.example.loan.dto.ApplicationDTO.Request;
 import com.example.loan.dto.ApplicationDTO.Response;
 import com.example.loan.dto.ResponseDTO;
@@ -33,6 +34,11 @@ public class ApplicationController extends AbstractController {
     public ResponseDTO<Void> delete(@PathVariable Long applicationId) {
         applicationService.delete(applicationId);
         return ok();
+    }
+
+    @PostMapping("/{applicationId}/terms")
+    public ResponseDTO<Boolean> acceptTerms(@PathVariable Long applicationId, @RequestBody AcceptTermsDTO request) {
+        return ok(applicationService.acceptTerms(applicationId, request));
     }
 
 }
