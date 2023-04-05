@@ -3,8 +3,10 @@ package com.example.loan.service;
 import com.example.loan.domain.Application;
 import com.example.loan.domain.Entry;
 import com.example.loan.dto.BalanceDTO;
+import com.example.loan.dto.BalanceDTO.CreateRequest;
 import com.example.loan.dto.EntryDTO.Request;
 import com.example.loan.dto.EntryDTO.Response;
+import com.example.loan.dto.EntryDTO.UpdateResponse;
 import com.example.loan.exception.BaseException;
 import com.example.loan.exception.ResultType;
 import com.example.loan.repository.ApplicationRepository;
@@ -14,6 +16,7 @@ import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.util.Optional;
 
 @Service
@@ -43,7 +46,7 @@ public class EntryServiceImpl implements EntryService {
 
         // 대출 잔고 관리
         balanceService.create(applicationId,
-                BalanceDTO.Request.builder()
+                CreateRequest.builder()
                         .entryAmount(request.getEntryAmount())
                         .build());
 
@@ -56,6 +59,35 @@ public class EntryServiceImpl implements EntryService {
 
         if (entry.isPresent()) return modelMapper.map(entry, Response.class);
         else return null;
+    }
+
+    @Override
+    public UpdateResponse update(Long entryId, Request request) {
+        // entry
+        Entry entry = entryRepository.findById(entryId).orElseThrow(() -> {
+            throw new BaseException(ResultType.SYSTEM_ERROR);
+        });
+
+        // before -> after
+        BigDecimal beforeEntryAmount = entry.getEntryAmount();
+        entry.setEntryAmount(request.getEntryAmount());
+
+        entryRepository.save(entry);
+
+        // balance update
+        balanceService.update(entry.getApplicationId(),
+                BalanceDTO.UpdateRequest.builder()
+                        .beforeEntryAmount(beforeEntryAmount)
+                        .afterEntryAmount(request.getEntryAmount())
+                        .build());
+
+        // response
+        return UpdateResponse.builder()
+                .entryId(entryId)
+                .applicationId(entry.getApplicationId())
+                .beforeEntryAmount(beforeEntryAmount)
+                .afterEntryAmount(request.getEntryAmount())
+                .build();
     }
 
     private boolean isContractedApplication(Long applicationId) {

@@ -12,10 +12,24 @@ public class BalanceDTO implements Serializable {
     @Builder
     @Getter
     @Setter
-    public static class Request {
+    public static class CreateRequest {
         private Long applicationId;
 
         private BigDecimal entryAmount;
+    }
+
+    @NoArgsConstructor
+    @AllArgsConstructor
+    @Builder
+    @Getter
+    @Setter
+    public static class UpdateRequest {
+        private Long applicationId;
+
+        private BigDecimal beforeEntryAmount;
+
+        private BigDecimal afterEntryAmount;
+
     }
 
     @NoArgsConstructor

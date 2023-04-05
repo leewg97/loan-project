@@ -2,6 +2,7 @@ package com.example.loan.controller;
 
 import com.example.loan.dto.EntryDTO.Request;
 import com.example.loan.dto.EntryDTO.Response;
+import com.example.loan.dto.EntryDTO.UpdateResponse;
 import com.example.loan.dto.ResponseDTO;
 import com.example.loan.service.EntryService;
 import lombok.RequiredArgsConstructor;
@@ -24,4 +25,8 @@ public class InternalController extends AbstractController {
         return ok(entryService.get(applicationId));
     }
 
+    @PutMapping("/entries/{entryId}")
+    public ResponseDTO<UpdateResponse> update(@PathVariable Long entryId, @RequestBody Request request) {
+        return ok(entryService.update(entryId, request));
+    }
 }
