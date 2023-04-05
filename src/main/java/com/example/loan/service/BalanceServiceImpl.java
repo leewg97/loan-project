@@ -2,6 +2,8 @@ package com.example.loan.service;
 
 import com.example.loan.domain.Balance;
 import com.example.loan.dto.BalanceDTO.CreateRequest;
+import com.example.loan.dto.BalanceDTO.RepaymentRequest;
+import com.example.loan.dto.BalanceDTO.RepaymentRequest.RepaymentType;
 import com.example.loan.dto.BalanceDTO.Response;
 import com.example.loan.dto.BalanceDTO.UpdateRequest;
 import com.example.loan.exception.BaseException;
@@ -44,6 +46,15 @@ public class BalanceServiceImpl implements BalanceService {
     }
 
     @Override
+    public Response get(Long applicationId) {
+        Balance balance = balanceRepository.findById(applicationId).orElseThrow(() -> {
+            throw new BaseException(ResultType.SYSTEM_ERROR);
+        });
+
+        return modelMapper.map(balance, Response.class);
+    }
+
+    @Override
     public Response update(Long applicationId, UpdateRequest request) {
         Balance balance = balanceRepository.findByApplicationId(applicationId).orElseThrow(() -> {
             throw new BaseException(ResultType.SYSTEM_ERROR);
@@ -60,5 +71,40 @@ public class BalanceServiceImpl implements BalanceService {
 
         return modelMapper.map(updated, Response.class);
     }
-}
 
+    @Override
+    public Response repaymentUpdate(Long applicationId, RepaymentRequest request) {
+        Balance balance = balanceRepository.findByApplicationId(applicationId).orElseThrow(() -> {
+            throw new BaseException(ResultType.SYSTEM_ERROR);
+        });
+
+        BigDecimal updatedBalance = balance.getBalance();
+        BigDecimal repaymentAmount = request.getRepaymentAmount();
+
+        // 상환 정상 : balance - repaymentAmount
+        // 상환금 롤백 : balance + repaymentAmount
+        if (request.getType().equals(RepaymentType.ADD)) {
+            updatedBalance = updatedBalance.add(repaymentAmount);
+        } else {
+            updatedBalance = updatedBalance.subtract(repaymentAmount);
+        }
+
+        balance.setBalance(updatedBalance);
+
+        Balance updated = balanceRepository.save(balance);
+
+        return modelMapper.map(updated, Response.class);
+    }
+
+
+    @Override
+    public void delete(Long applicationId) {
+        Balance balance = balanceRepository.findByApplicationId(applicationId).orElseThrow(() -> {
+            throw new BaseException(ResultType.SYSTEM_ERROR);
+        });
+
+        balance.setIsDeleted(true);
+
+        balanceRepository.save(balance);
+    }
+}
