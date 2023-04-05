@@ -24,4 +24,9 @@ public class ApplicationController extends AbstractController {
         return ok(applicationService.get(applicationId));
     }
 
+    @PutMapping("/{applicationId}")
+    public ResponseDTO<Response> update(@PathVariable Long applicationId, @RequestBody Request request) {
+        return ok(applicationService.update(applicationId, request));
+    }
+
 }
