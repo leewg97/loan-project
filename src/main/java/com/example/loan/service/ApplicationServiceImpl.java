@@ -3,6 +3,8 @@ package com.example.loan.service;
 import com.example.loan.domain.Application;
 import com.example.loan.dto.ApplicationDTO.Request;
 import com.example.loan.dto.ApplicationDTO.Response;
+import com.example.loan.exception.BaseException;
+import com.example.loan.exception.ResultType;
 import com.example.loan.repository.ApplicationRepository;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
@@ -27,4 +29,14 @@ public class ApplicationServiceImpl implements ApplicationService {
 
         return modelMapper.map(applied, Response.class);
     }
+
+    @Override
+    public Response get(Long applicationId) {
+        Application application = applicationRepository.findById(applicationId).orElseThrow(() -> {
+            throw new BaseException(ResultType.SYSTEM_ERROR);
+        });
+
+        return modelMapper.map(application, Response.class);
+    }
+
 }
