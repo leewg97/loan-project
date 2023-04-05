@@ -98,4 +98,26 @@ public class JudgmentServiceTest {
         assertThat(judgmentService.getJudgmentOfApplication(findId).getJudgmentId()).isSameAs(findId);
     }
 
+    @Test
+    void Should_ReturnUpdatedResponseOfExistJudgmentEntity_When_RequestUpdateExistJudgmentInfo() {
+        Long findId = 1L;
+
+        Judgment entity = Judgment.builder()
+                .judgmentId(1L)
+                .name("Member Kim")
+                .build();
+
+        Request request = Request.builder()
+                .name("Member Lee")
+                .build();
+
+        when(judgmentRepository.findById(findId)).thenReturn(Optional.ofNullable(entity));
+        when(judgmentRepository.save(ArgumentMatchers.any(Judgment.class))).thenReturn(entity);
+
+        Response actual = judgmentService.update(findId, request);
+
+        assertThat(actual.getJudgmentId()).isSameAs(findId);
+        assertThat(actual.getName()).isSameAs(request.getName());
+    }
+
 }
