@@ -44,13 +44,20 @@ public class InternalController extends AbstractController {
     }
 
     @PostMapping("{applicationId}/repayments")
-    public ResponseDTO<RepaymentDTO.Response> create(@PathVariable Long applicationId, @RequestBody RepaymentDTO.Request request) {
+    public ResponseDTO<RepaymentDTO.Response> create(@PathVariable Long applicationId,
+                                                     @RequestBody RepaymentDTO.Request request) {
         return ok(repaymentService.create(applicationId, request));
     }
 
     @GetMapping("{applicationId}/repayments")
     public ResponseDTO<List<ListResponse>> getPayments(@PathVariable Long applicationId) {
         return ok(repaymentService.get(applicationId));
+    }
+
+    @PutMapping("/repayments/{repaymentId}")
+    public ResponseDTO<RepaymentDTO.UpdateResponse> update(@PathVariable Long repaymentId,
+                                                           @RequestBody RepaymentDTO.Request request) {
+        return ok(repaymentService.update(repaymentId, request));
     }
 
 }
