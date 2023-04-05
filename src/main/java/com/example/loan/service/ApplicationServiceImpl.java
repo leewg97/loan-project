@@ -10,13 +10,16 @@ import com.example.loan.exception.BaseException;
 import com.example.loan.exception.ResultType;
 import com.example.loan.repository.AcceptTermsRepository;
 import com.example.loan.repository.ApplicationRepository;
+import com.example.loan.repository.JudgmentRepository;
 import com.example.loan.repository.TermsRepository;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Direction;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
@@ -27,6 +30,8 @@ import java.util.stream.Collectors;
 public class ApplicationServiceImpl implements ApplicationService {
 
     private final ApplicationRepository applicationRepository;
+
+    private final JudgmentRepository judgmentRepository;
 
     private final TermsRepository termsRepository;
 
@@ -113,5 +118,28 @@ public class ApplicationServiceImpl implements ApplicationService {
         }
 
         return true;
+    }
+
+    @Transactional
+    @Override
+    public Response contract(Long applicationId) {
+        Application application = applicationRepository.findById(applicationId).orElseThrow(() -> {
+            throw new BaseException(ResultType.SYSTEM_ERROR);
+        });
+
+        judgmentRepository.findByApplicationId(applicationId).orElseThrow(() -> {
+            throw new BaseException(ResultType.SYSTEM_ERROR);
+        });
+
+        if (application.getApprovalAmount() == null
+                || application.getApprovalAmount().compareTo(BigDecimal.ZERO) == 0) {
+            throw new BaseException(ResultType.SYSTEM_ERROR);
+        }
+
+        application.setContractedAt(LocalDateTime.now());
+
+        Application updated = applicationRepository.save(application);
+
+        return modelMapper.map(updated, Response.class);
     }
 }

@@ -16,4 +16,6 @@ public interface ApplicationService {
 
     Boolean acceptTerms(Long applicationId, AcceptTermsDTO request);
 
+    Response contract(Long applicationId);
+
 }
