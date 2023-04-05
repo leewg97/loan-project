@@ -24,13 +24,13 @@ public class Counsel extends BaseEntity {
     @Column(nullable = false, updatable = false)
     private Long counselId;
 
-    @Column(columnDefinition = "datetime DEFAULT NULL COMMENT '신청일자'")
+    @Column(nullable = false, columnDefinition = "datetime DEFAULT NULL COMMENT '신청일자'")
     private LocalDateTime appliedAt;
 
-    @Column(columnDefinition = "varchar(12) DEFAULT NULL COMMENT '상담 요청자'")
+    @Column(nullable = false, columnDefinition = "varchar(12) DEFAULT NULL COMMENT '상담 요청자'")
     private String name;
 
-    @Column(columnDefinition = "varchar(13) DEFAULT NULL COMMENT '전화번호'")
+    @Column(nullable = false, columnDefinition = "varchar(13) DEFAULT NULL COMMENT '전화번호'")
     private String cellPhone;
 
     @Column(columnDefinition = "varchar(50) DEFAULT NULL COMMENT '책임자 이메일'")
