@@ -12,4 +12,6 @@ public interface EntryService {
 
     UpdateResponse update(Long entryId, Request request);
 
+    void delete(Long entryId);
+
 }

@@ -90,6 +90,28 @@ public class EntryServiceImpl implements EntryService {
                 .build();
     }
 
+    @Transactional
+    @Override
+    public void delete(Long entryId) {
+        Entry entry = entryRepository.findById(entryId).orElseThrow(() -> {
+            throw new BaseException(ResultType.SYSTEM_ERROR);
+        });
+
+        entry.setIsDeleted(true);
+
+        entryRepository.save(entry);
+
+        BigDecimal beforeEntryAmount = entry.getEntryAmount();
+
+        Long applicationId = entry.getApplicationId();
+        balanceService.update(applicationId,
+                BalanceDTO.UpdateRequest.builder()
+                        .beforeEntryAmount(beforeEntryAmount)
+                        .afterEntryAmount(BigDecimal.ZERO)
+                        .build()
+        );
+    }
+
     private boolean isContractedApplication(Long applicationId) {
         Optional<Application> existed = applicationRepository.findById(applicationId);
         if (existed.isEmpty()) return false;
