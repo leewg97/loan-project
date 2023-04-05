@@ -13,4 +13,6 @@ public interface JudgmentService {
 
     Response update(Long judgmentId, Request request);
 
+    void delete(Long judgmentId);
+
 }
