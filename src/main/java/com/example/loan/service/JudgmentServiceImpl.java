@@ -1,6 +1,7 @@
 package com.example.loan.service;
 
 import com.example.loan.domain.Judgment;
+import com.example.loan.dto.JudgmentDTO;
 import com.example.loan.dto.JudgmentDTO.Request;
 import com.example.loan.dto.JudgmentDTO.Response;
 import com.example.loan.exception.BaseException;
@@ -36,6 +37,28 @@ public class JudgmentServiceImpl implements JudgmentService {
 
         // save -> response dto
         return modelMapper.map(saved, Response.class);
+    }
+
+    @Override
+    public Response get(Long judgmentId) {
+        Judgment judgment = judgmentRepository.findById(judgmentId).orElseThrow(() -> {
+            throw new BaseException(ResultType.SYSTEM_ERROR);
+        });
+
+        return modelMapper.map(judgment, JudgmentDTO.Response.class);
+    }
+
+    @Override
+    public Response getJudgmentOfApplication(Long applicationId) {
+        if (!isPresentApplication(applicationId)) {
+            throw new BaseException(ResultType.SYSTEM_ERROR);
+        }
+
+        Judgment judgment = judgmentRepository.findByApplicationId(applicationId).orElseThrow(() -> {
+            throw new BaseException(ResultType.SYSTEM_ERROR);
+        });
+
+        return modelMapper.map(judgment, JudgmentDTO.Response.class);
     }
 
     private boolean isPresentApplication(Long applicationId) {
